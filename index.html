@@ -215,7 +215,8 @@
 {
   "imports": {
     "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+    "three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.8/build/index.module.js"
   }
 }
 </script>
@@ -225,6 +226,7 @@
   import { KTX2Loader } from "three/addons/loaders/KTX2Loader.js";
   import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
   import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+  import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
 
   const canvas = document.getElementById("stage");
   const statusEl = document.getElementById("status");
@@ -286,7 +288,8 @@
   if (renderer) start();
 
   function start() {
-    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, lowPower ? 1.25 : 2));
+    let dpr = Math.min(devicePixelRatio || 1, lowPower ? 1 : 1.5);
+    renderer.setPixelRatio(dpr);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
     renderer.shadowMap.enabled = !lowPower;
@@ -300,14 +303,14 @@
     scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     pmrem.dispose();
 
-    const camera = new THREE.PerspectiveCamera(50, 1, 0.3, 3000);
+    const camera = new THREE.PerspectiveCamera(50, 1, 0.3, 1700);   // nothing past the fog is drawn
 
     scene.add(new THREE.HemisphereLight(0xdfeaf5, 0x4a4637, 1.3));
     // The sun follows the car so its shadow map stays tight and sharp.
     const sun = new THREE.DirectionalLight(0xfff1dc, 2.4);
     const SUN_DIR = new THREE.Vector3(0.45, 1, 0.3).normalize();
     sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.mapSize.set(1024, 1024);
     Object.assign(sun.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10, near: 1, far: 120 });
     sun.shadow.bias = -0.0005;
     scene.add(sun, sun.target);
@@ -341,9 +344,20 @@
       load("assets/redbull-rb18.glb", "car"),
       fetch("assets/spa-line.json").then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }),
     ]).then(([track, car, line]) => {
-      track.scene.traverse((o) => { if (o.isMesh) o.receiveShadow = true; });
+      const road = [];
+      track.scene.traverse((o) => {
+        if (!o.isMesh) return;
+        o.receiveShadow = true;
+        if (/asph|groove|kerb|CURB|line|road/.test(o.material.name)) {
+          o.geometry.computeBoundsTree = computeBoundsTree;
+          o.geometry.computeBoundsTree();
+          o.raycast = acceleratedRaycast;
+          road.push(o);
+        }
+      });
       scene.add(track.scene);
-      run(buildLap(line.pts), prepCar(car.scene));
+      track.scene.updateMatrixWorld(true);
+      run(buildLap(line.pts, road), prepCar(car.scene));
     }).catch((err) => fail("Couldn't load the circuit", err));
 
     /* ── Car: orient so the nose points +Z, wheels on y = 0, real length ── */
@@ -365,11 +379,68 @@
       const car = new THREE.Group();
       car.add(model);
       scene.add(car);
+      car.userData.wheels = splitWheels(model);
       return car;
     }
 
+    /* ── Wheels ─────────────────────────────────────────────────
+       The model stores all four tyres (and all four rims) in one mesh per
+       material. Split them by corner of the car so each wheel can spin on
+       its own axle and the fronts can steer. Model space: x across, z along. */
+    function splitWheels(model) {
+      const parts = [];
+      model.traverse((o) => { if (o.isMesh && /Rim|Tyre/.test(o.material.name)) parts.push(o); });
+      if (!parts.length) return [];
+      const box = new THREE.Box3();
+      parts.forEach((m) => { m.geometry.computeBoundingBox(); box.union(m.geometry.boundingBox); });
+      const mid = box.getCenter(new THREE.Vector3());
+      const quad = (x, z) => (z > mid.z ? 0 : 2) + (x > mid.x ? 0 : 1);   // 0,1 front · 2,3 rear
+
+      const pieces = [[], [], [], []];                                   // per wheel: { mesh, geo }
+      const bounds = [0, 1, 2, 3].map(() => new THREE.Box3());
+      for (const mesh of parts) {
+        const g = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry;
+        const P = g.attributes.position, tris = [[], [], [], []];
+        for (let t = 0; t < P.count; t += 3) {
+          const x = (P.getX(t) + P.getX(t + 1) + P.getX(t + 2)) / 3;
+          const z = (P.getZ(t) + P.getZ(t + 1) + P.getZ(t + 2)) / 3;
+          tris[quad(x, z)].push(t);
+        }
+        tris.forEach((list, w) => {
+          if (!list.length) return;
+          const geo = new THREE.BufferGeometry();
+          for (const [name, a] of Object.entries(g.attributes)) {
+            const out = new Float32Array(list.length * 3 * a.itemSize);
+            let k = 0;
+            for (const t of list) for (let v = t; v < t + 3; v++) for (let c = 0; c < a.itemSize; c++) out[k++] = a.getComponent(v, c);
+            geo.setAttribute(name, new THREE.BufferAttribute(out, a.itemSize));
+          }
+          geo.computeBoundingBox();
+          if (/Tyre/.test(mesh.material.name)) bounds[w].union(geo.boundingBox);
+          pieces[w].push({ mesh, geo });
+        });
+      }
+      // one pivot per wheel at the tyre's centre: steer (y) outside, spin (x) inside
+      const wheels = bounds.map((b, w) => {
+        const c = b.getCenter(new THREE.Vector3());
+        const steer = new THREE.Group(), spin = new THREE.Group();
+        steer.position.copy(c);
+        steer.add(spin);
+        parts[0].parent.add(steer);
+        for (const { mesh, geo } of pieces[w]) {
+          geo.translate(-c.x, -c.y, -c.z);
+          const m = new THREE.Mesh(geo, mesh.material);
+          m.castShadow = true;
+          spin.add(m);
+        }
+        return { steer, spin, front: w < 2 };
+      });
+      parts.forEach((m) => m.removeFromParent());
+      return wheels;
+    }
+
     /* ── Lap: resample the centerline every metre + a speed profile ── */
-    function buildLap(raw) {
+    function buildLap(raw, road) {
       const curve = new THREE.CatmullRomCurve3(raw.map((p) => new THREE.Vector3(p[0], p[1], p[2])), true, "centripetal");
       curve.arcLengthDivisions = raw.length * 8;
       const L = curve.getLength();
@@ -378,6 +449,26 @@
       for (let i = 0; i < N; i++) pos.push(curve.getPointAt(i / N));
       const at = (i) => pos[((i % N) + N) % N];
       for (let i = 0; i < N; i++) fwd.push(at(i + 2).clone().sub(at(i - 2)).normalize());
+
+      // Where the left and right wheels actually touch the road, every metre.
+      // The car's pitch and roll come from these, so it follows crests and banking.
+      const ray = new THREE.Raycaster();
+      ray.firstHitOnly = true;
+      ray.far = 10;
+      const down = new THREE.Vector3(0, -1, 0), o = new THREE.Vector3();
+      const ground = (p, left, off) => {
+        o.copy(p).addScaledVector(left, off);
+        o.y += 4;
+        ray.set(o, down);
+        const hit = ray.intersectObjects(road, false)[0];
+        return hit ? hit.point.clone() : o.clone().setY(p.y);
+      };
+      const gL = [], gR = [];
+      for (let i = 0; i < N; i++) {
+        const left = new THREE.Vector3(fwd[i].z, 0, -fwd[i].x).normalize();
+        gL.push(ground(pos[i], left, 0.8));
+        gR.push(ground(pos[i], left, -0.8));
+      }
 
       // curvature from heading change over ±12 m, then the fastest speed that
       // corner allows, then acceleration and braking limits in both directions
@@ -396,12 +487,12 @@
         for (let i = 1; i <= N; i++) { const a = i % N, b = i - 1; v[a] = Math.min(v[a], Math.sqrt(v[b] ** 2 + 2 * ACC * (1 - v[b] / 105))); }
         for (let i = N - 2; i >= -1; i--) { const a = (i + N) % N, b = (i + 1) % N; v[a] = Math.min(v[a], Math.sqrt(v[b] ** 2 + 2 * BRAKE)); }
       }
-      return { N, pos, fwd, turn, v };
+      return { N, pos, fwd, turn, v, gL, gR };
     }
 
     /* ── Run: drive, direct the cameras, update the readout ── */
     function run(lap, car) {
-      const { N, pos, fwd, turn, v } = lap;
+      const { N, pos, fwd, turn, v, gL, gR } = lap;
       const UP = new THREE.Vector3(0, 1, 0);
       const wrap = (s) => ((s % N) + N) % N;
       const sample = (arr, s) => {
@@ -427,10 +518,19 @@
       const camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
       const tmp = new THREE.Vector3();
 
+      const basis = new THREE.Matrix4(), cf = new THREE.Vector3(), cu = new THREE.Vector3(), cl = new THREE.Vector3();
+      const axleMid = (at) => sample(gL, at).add(sample(gR, at)).multiplyScalar(0.5);
       function placeCar() {
-        const p = sample(pos, s);
+        // front and rear axles are ~1.8 m either side of the car's middle
+        const front = axleMid(s + 1.8), rear = axleMid(s - 1.8);
+        const p = front.clone().add(rear).multiplyScalar(0.5);
+        cf.copy(front).sub(rear).normalize();
+        cl.copy(sample(gL, s)).sub(sample(gR, s)).normalize();
+        cu.crossVectors(cf, cl).normalize();
+        cl.crossVectors(cu, cf);
+        basis.makeBasis(cl, cu, cf);
+        car.quaternion.setFromRotationMatrix(basis);
         car.position.copy(p);
-        car.lookAt(tmp.copy(sample(pos, s + 3)));
         sun.position.copy(p).addScaledVector(SUN_DIR, 60);
         sun.target.position.copy(p);
       }
@@ -473,26 +573,57 @@
         return m + ":" + (sec < 10 ? "0" : "") + sec.toFixed(3);
       };
 
+      const wheels = car.userData.wheels;
+      function turnWheels(step) {
+        const i = Math.floor(wrap(s));
+        // front-wheel angle for this corner (wheelbase 3.6 m); >0 steers left
+        const steer = Math.atan(3.6 * turn[i] / 24);
+        // real wheel speed is ~250 rad/s, far past what 60 fps can show without
+        // strobing backwards, so the visible spin is capped
+        const spin = Math.min(speedAt(s) / 0.36, 45) * step;
+        for (const w of wheels) {
+          if (w.front) w.steer.rotation.y = steer;
+          w.spin.rotation.x += spin;
+        }
+      }
+
+      // Drop the render resolution if the machine can't keep up.
+      let frameMs = 16, lastTune = 0;
+      function tune(now, raw) {
+        frameMs += (raw - frameMs) * 0.05;
+        if (now - lastTune < 2000) return;
+        lastTune = now;
+        if (frameMs > 24 && dpr > 0.75) {
+          dpr = Math.max(0.75, dpr - 0.25);
+          renderer.setPixelRatio(dpr);
+          resize();
+        }
+      }
+
       let visible = true, last = performance.now();
       new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(canvas);
 
       function tick(now) {
-        const dt = Math.min(0.05, (now - last) / 1000);
+        const raw = now - last;
+        const dt = Math.min(0.05, raw / 1000);
         last = now;
         if (!visible) return;
+        if (freezeAt === null) tune(now, raw);
 
         const next = shotAt(s);
         const cut = next !== shot;
         shot = next;
 
+        let step = 0;
         if (freezeAt === null && !reduceMotion) {
           timeScale += ((shot.slow || 1) - timeScale) * (1 - Math.exp(-dt * 3));
-          const step = dt * timeScale;
+          step = dt * timeScale;
           lapTime += step;
           s += speedAt(s) * step;
           if (s >= N) { s -= N; lapTime = 0; }
         }
         placeCar();
+        turnWheels(step);
         aimCamera(dt, cut);
         renderer.render(scene, camera);
 
