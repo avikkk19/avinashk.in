@@ -12,6 +12,7 @@
     const k = e.key.toLowerCase();
     if (k === "h") location.href = "/";
     else if (k === "b") location.href = "/blog/";
+    else if (k === "r") location.href = "/resume/";
     else if (k === "t") location.href = "/#term";
     else if ((k === "j" || k === "k") && heads.length) {
       e.preventDefault();

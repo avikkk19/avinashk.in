@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>404 · Avinash Kamadri</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script>try { if (localStorage.getItem("theme") === "light") document.documentElement.dataset.theme = "light"; } catch (e) {}</script>
+<script src="/assets/pixel.js" defer></script>
+<script src="/blog/blog.js" defer></script>
+<style>
+  .lost { padding: 5rem 0; }
+  .lost svg { width: 7rem; height: auto; display: block; overflow: visible; margin-bottom: 2rem; }
+  .lost .ln { margin: 0; white-space: pre-wrap; }
+  .lost .cmd { color: var(--dim); }
+  .lost .cmd b { color: var(--fg); font-weight: 500; }
+  .lost .out { position: relative; padding-left: 1.5rem; margin-top: 0.4rem; }
+  .lost .out::before { content: "\23FA"; position: absolute; left: 0; color: var(--accent); }
+  .lost .sub { position: relative; padding-left: 1.5rem; color: var(--dim); }
+  .lost .sub::before { content: "\23BF"; position: absolute; left: 0.35rem; }
+  .lost .sub a { color: var(--fg); text-decoration-color: var(--accent); text-underline-offset: 3px; }
+  .lost .gap { height: 1.2rem; }
+  .lost .fire { opacity: 1; }
+</style>
+</head>
+<body>
+  <header class="top">
+    <a href="/" aria-label="Home"><svg class="mascot" data-pixel="dragon" aria-hidden="true"></svg></a>
+    <nav aria-label="Site">
+      <a href="/"><kbd>[H]</kbd> Home</a>
+      <a href="/blog/"><kbd>[B]</kbd> Blog</a>
+      <a href="/resume/"><kbd>[R]</kbd> Resume</a>
+      <a href="/#term"><kbd>[T]</kbd> Terminal</a>
+    </nav>
+    <a class="cta" href="mailto:avinashkamadri16@gmail.com">Say hello</a>
+  </header>
+  <main class="grid">
+    <div class="col lost">
+      <svg data-pixel="dragon" aria-hidden="true"></svg>
+      <h1>404</h1>
+      <p class="ln cmd">guest@avinashk.in &gt; <b id="path">cd /somewhere</b></p>
+      <p class="ln out">cd: no such file or directory</p>
+      <p class="ln sub">The dragon ate this page. Or it never existed.</p>
+      <div class="gap"></div>
+      <p class="ln cmd">guest@avinashk.in &gt; <b>ls</b></p>
+      <p class="ln out">Try one of these</p>
+      <p class="ln sub"><a href="/">~/</a>        the terminal homepage</p>
+      <p class="ln sub"><a href="/blog/">blog/</a>     posts about F1 and building things</p>
+      <p class="ln sub"><a href="/resume/">resume/</a>   the short version of me</p>
+    </div>
+  </main>
+  <script>document.getElementById("path").textContent = "cd " + decodeURIComponent(location.pathname);</script>
+</body>
+</html>

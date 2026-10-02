@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>Avinash Kamadri</title>
+  <link>https://avinashk.in/blog/</link>
+  <description>Notes on what I'm building and learning, and a lot of F1.</description>
+  <language>en</language>
+  <atom:link href="https://avinashk.in/feed.xml" rel="self" type="application/rss+xml" />
+  <lastBuildDate>Sat, 03 Oct 2026 12:00:00 +0000</lastBuildDate>
+  <item>
+    <title>Max vs Lewis: the 2021 title fight</title>
+    <link>https://avinashk.in/blog/max-vs-lewis-2021/</link>
+    <guid isPermaLink="true">https://avinashk.in/blog/max-vs-lewis-2021/</guid>
+    <pubDate>Sat, 03 Oct 2026 12:00:00 +0000</pubDate>
+    <category>F1</category>
+    <description>Twenty-two races, two big crashes and one final lap. The season that had everything.</description>
+  </item>
+  <item>
+    <title>Daniel Ricciardo: the smile and the late brake</title>
+    <link>https://avinashk.in/blog/daniel-ricciardo-career/</link>
+    <guid isPermaLink="true">https://avinashk.in/blog/daniel-ricciardo-career/</guid>
+    <pubDate>Sat, 03 Oct 2026 12:00:00 +0000</pubDate>
+    <category>F1</category>
+    <description>Eight wins, a lot of shoeys and some of the best overtakes of his era.</description>
+  </item>
+  <item>
+    <title>Michael Schumacher: building a dynasty</title>
+    <link>https://avinashk.in/blog/michael-schumacher/</link>
+    <guid isPermaLink="true">https://avinashk.in/blog/michael-schumacher/</guid>
+    <pubDate>Sat, 03 Oct 2026 12:00:00 +0000</pubDate>
+    <category>F1</category>
+    <description>Seven titles, 91 wins, and how he turned Ferrari back into a winning team.</description>
+  </item>
+  <item>
+    <title>Lewis Hamilton: from Stevenage to seven titles</title>
+    <link>https://avinashk.in/blog/lewis-hamilton/</link>
+    <guid isPermaLink="true">https://avinashk.in/blog/lewis-hamilton/</guid>
+    <pubDate>Sat, 03 Oct 2026 12:00:00 +0000</pubDate>
+    <category>F1</category>
+    <description>A one-point heartbreak, a last-corner title, a bold move to Mercedes and a dream move to Ferrari.</description>
+  </item>
+  <item>
+    <title>Fernando Alonso: the one who never stops</title>
+    <link>https://avinashk.in/blog/fernando-alonso/</link>
+    <guid isPermaLink="true">https://avinashk.in/blog/fernando-alonso/</guid>
+    <pubDate>Sat, 03 Oct 2026 12:00:00 +0000</pubDate>
+    <category>F1</category>
+    <description>Two titles, a run of almost-titles, Le Mans wins and more F1 starts than anyone.</description>
+  </item>
+  <item>
+    <title>Valtteri Bottas: the quiet one</title>
+    <link>https://avinashk.in/blog/valtteri-bottas/</link>
+    <guid isPermaLink="true">https://avinashk.in/blog/valtteri-bottas/</guid>
+    <pubDate>Sat, 03 Oct 2026 12:00:00 +0000</pubDate>
+    <category>F1</category>
+    <description>Ten wins, two runner-up finishes, and the hardest job in F1: teammate to Lewis Hamilton.</description>
+  </item>
+  <item>
+    <title>A terminal for a homepage</title>
+    <link>https://avinashk.in/blog/a-terminal-for-a-homepage/</link>
+    <guid isPermaLink="true">https://avinashk.in/blog/a-terminal-for-a-homepage/</guid>
+    <pubDate>Fri, 02 Oct 2026 12:00:00 +0000</pubDate>
+    <category>Frontend</category>
+    <description>Swapping a hero section for a prompt: slash commands, a pixel dragon and no framework.</description>
+  </item>
+  <item>
+    <title>Lapping Spa in the browser</title>
+    <link>https://avinashk.in/blog/lapping-spa-in-the-browser/</link>
+    <guid isPermaLink="true">https://avinashk.in/blog/lapping-spa-in-the-browser/</guid>
+    <pubDate>Wed, 30 Sep 2026 12:00:00 +0000</pubDate>
+    <category>3D</category>
+    <description>How the RB18 in my footer stays on the road, picks its speed and gets filmed like a broadcast.</description>
+  </item>
+</channel>
+</rss>

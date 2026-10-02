@@ -5,6 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Avinash Kamadri</title>
 <meta name="description" content="Avinash Kamadri — full-stack developer working on web apps, front end and back end." />
+<!-- meta:start -->
+<link rel="canonical" href="https://avinashk.in/" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="alternate" type="application/rss+xml" title="Avinash Kamadri" href="/feed.xml" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Avinash Kamadri" />
+<meta property="og:title" content="Avinash Kamadri" />
+<meta property="og:description" content="Full-stack developer working on web apps, front end and back end. A terminal homepage, a blog about F1 and a Red Bull lapping Spa." />
+<meta property="og:url" content="https://avinashk.in/" />
+<meta property="og:image" content="https://avinashk.in/og/home.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<!-- meta:end -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -89,6 +103,7 @@
   .row .t { font-weight: 500; }
   .row .m { color: var(--dim); text-align: right; white-space: nowrap; }
   button.row:hover .t { color: var(--accent); }
+  #nr-count { color: var(--accent); font-variant-numeric: tabular-nums; }
   #writing { margin-top: 1.4rem; }
   #writing:empty { display: none; }
   a.row { text-decoration: none; }
@@ -252,7 +267,7 @@
   .sf-col a { text-decoration: none; font-size: 1rem; }
   .sf-col a:hover { color: var(--accent); }
   .sf-lead { margin: 0 0 1rem; font-size: 1rem; }
-  .sf-field { display: flex; border-bottom: 1px solid var(--line); }
+  .sf-field { display: flex; border-bottom: 1px solid var(--line); margin-bottom: 0.4rem; }
   .sf-field:focus-within { border-color: var(--accent); }
   .sf-field input { flex: 1; min-width: 0; background: none; border: 0; color: var(--fg); font: inherit; font-size: max(16px, 1rem); padding: 0.55rem 0; }
   .sf-field input:focus-visible { outline: none; }
@@ -291,6 +306,7 @@
           <button type="button" data-cmd="work"><kbd>[W]</kbd> Work</button>
           <button type="button" data-cmd="contact"><kbd>[C]</kbd> Contact</button>
           <button type="button" data-cmd="blog"><kbd>[B]</kbd> Blog</button>
+          <button type="button" data-cmd="resume"><kbd>[R]</kbd> Resume</button>
           <button type="button" data-cmd="f1"><kbd>[F]</kbd> F1 Lap</button>
           <button type="button" data-cmd="terminal"><kbd>[T]</kbd> Terminal</button>
         </nav>
@@ -317,7 +333,8 @@
       <div class="grow"></div>
 
       <ul class="rows" aria-label="Featured">
-        <li><button type="button" class="row" data-cmd="dragon"><span class="c">Featured</span><span class="t">Meet the dragon</span><span class="m">/dragon</span></button></li>
+        <li id="next-race" hidden><button type="button" class="row" data-cmd="next"><span class="c">Next race</span><span class="t" id="nr-name"></span><span class="m" id="nr-count"></span></button></li>
+        <li><button type="button" class="row" data-cmd="dragon"><span class="c" id="feat-label">Featured</span><span class="t">Meet the dragon</span><span class="m">/dragon</span></button></li>
         <li><button type="button" class="row" data-cmd="f1"><span class="c"></span><span class="t">Watch an RB18 lap Spa</span><span class="m">/f1</span></button></li>
         <li><button type="button" class="row" data-cmd="contact"><span class="c"></span><span class="t">Get in touch</span><span class="m">/contact</span></button></li>
       </ul>
@@ -443,10 +460,15 @@
           <p class="sf-lead">Questions, ideas or hot F1 takes. Straight to my inbox.</p>
           <label class="sr-only" for="note-text">Your note</label>
           <div class="sf-field">
-            <input id="note-text" type="text" placeholder="Write a quick note" autocomplete="off" />
+            <input id="note-text" type="text" placeholder="Write a quick note" autocomplete="off" required />
+          </div>
+          <label class="sr-only" for="note-from">Your email (optional, so I can reply)</label>
+          <div class="sf-field">
+            <input id="note-from" type="email" placeholder="Your email, if you'd like a reply" autocomplete="email" />
             <button type="submit" aria-label="Send">&rarr;</button>
           </div>
-          <p class="sf-small">This opens your email app with the note filled in. Nothing is stored here.</p>
+          <input type="checkbox" name="botcheck" id="note-bot" tabindex="-1" autocomplete="off" style="display:none" />
+          <p class="sf-small" id="note-status" role="status">Goes straight to my inbox.</p>
         </form>
       </div>
       <div class="space" id="space">
@@ -467,10 +489,37 @@
 <script>
   /* ── Closing footer: note form + dotted space scene ── */
   (() => {
-    document.getElementById("note").addEventListener("submit", (e) => {
+    // Web3Forms access key (free, from web3forms.com). It's meant to be public.
+    // Until it's set, the form falls back to opening the visitor's email app.
+    const FORM_KEY = "";
+    const note = document.getElementById("note"), status = document.getElementById("note-status");
+    note.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const t = document.getElementById("note-text").value.trim();
-      location.href = "mailto:avinashkamadri16@gmail.com?subject=" + encodeURIComponent("Hello from avinashk.in") + (t ? "&body=" + encodeURIComponent(t) : "");
+      const text = document.getElementById("note-text").value.trim();
+      const from = document.getElementById("note-from").value.trim();
+      if (!text || document.getElementById("note-bot").checked) return;
+      if (!FORM_KEY) {
+        location.href = "mailto:avinashkamadri16@gmail.com?subject=" + encodeURIComponent("Hello from avinashk.in") + "&body=" + encodeURIComponent(text);
+        return;
+      }
+      const btn = note.querySelector("button[type=submit]");
+      btn.disabled = true;
+      status.textContent = "Sending…";
+      try {
+        const r = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ access_key: FORM_KEY, subject: "Note from avinashk.in", from_name: "avinashk.in", message: text, email: from || undefined, replyto: from || undefined }),
+        });
+        const j = await r.json();
+        if (!j.success) throw new Error(j.message);
+        note.reset();
+        status.textContent = "Sent. Thanks, I'll read it soon.";
+      } catch (err) {
+        status.innerHTML = 'Couldn\'t send that. Try <a href="mailto:avinashkamadri16@gmail.com">email</a> instead.';
+      } finally {
+        btn.disabled = false;
+      }
     });
 
     // the dragon, in a helmet
@@ -621,7 +670,9 @@
       ["contact", "email and GitHub"],
       ["dragon", "say hi to the mascot"],
       ["f1", "watch the RB18 lap Spa"],
+      ["next", "the next F1 race, with a countdown"],
       ["posts", "the latest blog posts"],
+      ["resume", "my resume (and a PDF)"],
       ["read", "open post n: /read 1"],
       ["blog", "every post"],
       ["ls", "list the files"],
@@ -631,6 +682,25 @@
       ["clear", "clear the scrollback"],
     ];
     const NEEDS_ARG = new Set(["cat", "echo", "read"]);
+
+    // Next F1 race from the Jolpica (Ergast) API: a Featured row with a live countdown, and /next.
+    let RACE;                                     // undefined while loading, null if it failed
+    const countdown = (ms) => {
+      if (ms <= 0) return "racing now";
+      const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60;
+      return (d ? d + "d " : "") + String(h).padStart(2, "0") + "h " + String(m).padStart(2, "0") + "m";
+    };
+    fetch("https://api.jolpi.ca/ergast/f1/current/next.json").then((r) => r.json()).then((j) => {
+      RACE = j.MRData.RaceTable.Races[0] || null;
+      if (!RACE) return;
+      const start = new Date(RACE.date + "T" + (RACE.time || "00:00:00Z"));
+      document.getElementById("nr-name").textContent = RACE.raceName;
+      const tick = () => { document.getElementById("nr-count").textContent = countdown(start - Date.now()); };
+      tick();
+      setInterval(tick, 30000);
+      document.getElementById("next-race").hidden = false;
+      document.getElementById("feat-label").textContent = "";
+    }).catch(() => { RACE = null; });
 
     // Blog index, shared with the Writing list below the featured rows.
     let POSTS = [];
@@ -669,6 +739,20 @@
         return [`Opening <span class="k">${p.title}</span>…`];
       },
       blog: () => { setTimeout(() => { location.href = "/blog/"; }, 400); return ["Opening the blog…"]; },
+      resume: () => { setTimeout(() => { location.href = "/resume/"; }, 400); return ["Opening my resume…", 'or grab the <a href="/resume/avinash-kamadri-resume.pdf" download>PDF</a>']; },
+      next: () => {
+        if (!RACE) return { err: [RACE === null ? "Couldn't reach the F1 calendar right now." : "Still loading the F1 calendar, try again in a second."] };
+        const when = (iso) => new Date(iso).toLocaleString(undefined, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+        const lines = [
+          `<span class="k">${esc(RACE.raceName)}</span> <span class="d">· round ${RACE.round}, ${RACE.season}</span>`,
+          `${esc(RACE.Circuit.circuitName)}, ${esc(RACE.Circuit.Location.locality)}, ${esc(RACE.Circuit.Location.country)}`,
+        ];
+        const at = (s) => s && s.date + "T" + (s.time || "00:00:00Z");
+        if (RACE.Qualifying) lines.push(`qualifying  ${when(at(RACE.Qualifying))}`);
+        lines.push(`race        ${when(at(RACE))}  <span class="d">(your time)</span>`);
+        lines.push(`lights out in <span class="k">${countdown(new Date(at(RACE)) - Date.now())}</span>`);
+        return lines;
+      },
       f1: () => { go("spa"); return ["Heading to Spa-Francorchamps…", "RB18 lapping in the footer. Broadcast cameras on."]; },
       dragon: () => ({ dragon: true }),
       ls: () => ['<span class="k">about.md</span>  <span class="k">stack.txt</span>  <span class="k">projects/</span>  <span class="k">contact.vcf</span>  spa.glb'],
@@ -694,7 +778,7 @@
       exit: () => ['There is no exit, only <span class="k">/contact</span>.'],
       clear: () => { log.replaceChildren(); return null; },
     };
-    const ALIAS = { "?": "help", skills: "stack", projects: "work", email: "contact", github: "contact", spa: "f1", lap: "f1", rb18: "f1", cls: "clear", writing: "posts", articles: "posts", open: "read", me: "whoami", fire: "dragon", hi: "dragon", hello: "dragon" };
+    const ALIAS = { "?": "help", skills: "stack", projects: "work", email: "contact", github: "contact", spa: "f1", lap: "f1", rb18: "f1", cls: "clear", cv: "resume", race: "next", gp: "next", writing: "posts", articles: "posts", open: "read", me: "whoami", fire: "dragon", hi: "dragon", hello: "dragon" };
 
     const add = (cls, html) => {
       const p = document.createElement("p");
@@ -847,7 +931,7 @@
       });
     });
 
-    const KEYS = { a: "about", s: "stack", w: "work", c: "contact", f: "f1", b: "blog" };
+    const KEYS = { a: "about", s: "stack", w: "work", c: "contact", f: "f1", b: "blog", r: "resume", n: "next" };
     document.addEventListener("keydown", (e) => {
       if (e.ctrlKey || e.metaKey || e.altKey || e.target.closest("input, textarea")) return;
       const k = e.key.toLowerCase();

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Resume · Avinash Kamadri</title>
+<meta name="description" content="Avinash Kamadri's resume: full-stack developer working on web apps." />
+<!-- meta:start -->
+<link rel="canonical" href="https://avinashk.in/resume/" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="alternate" type="application/rss+xml" title="Avinash Kamadri" href="/feed.xml" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Avinash Kamadri" />
+<meta property="og:title" content="Resume · Avinash Kamadri" />
+<meta property="og:description" content="Avinash Kamadri&#x27;s resume: full-stack developer working on web apps." />
+<meta property="og:url" content="https://avinashk.in/resume/" />
+<meta property="og:image" content="https://avinashk.in/og/resume.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<!-- meta:end -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script>try { if (localStorage.getItem("theme") === "light") document.documentElement.dataset.theme = "light"; } catch (e) {}</script>
+<script src="/assets/pixel.js" defer></script>
+<script src="/blog/blog.js" defer></script>
+<style>
+  .cv { padding: 3.5rem 0 5rem; }
+  .cv-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; padding-bottom: 2rem; border-bottom: 1px solid var(--line); }
+  .cv-head h1 { margin: 0 0 0.4rem; }
+  .cv-head .role { margin: 0; font-family: var(--sans); font-size: 1.08rem; color: var(--body); }
+  .cv-head .where { margin: 0.5rem 0 0; color: var(--dim); font-size: 0.85rem; }
+  .cv-links { list-style: none; margin: 1rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.3rem 1.2rem; font-size: 0.85rem; }
+  .cv-links a { color: var(--fg); text-decoration-color: var(--accent); text-underline-offset: 3px; }
+  .pdf { display: inline-block; padding: 0.45rem 0.8rem; background: var(--inv-bg); color: var(--inv-fg); text-decoration: none; font-size: 0.9rem; white-space: nowrap; }
+  .pdf:hover { background: var(--accent); color: #141413; }
+  .cv section { padding: 2rem 0 0.4rem; }
+  .cv h2 { margin: 0 0 1rem; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--dim); font-weight: 500; }
+  .cv h2::before { content: "> "; color: var(--accent); }
+  .cv p, .cv li { font-family: var(--sans); color: var(--body); line-height: 1.7; }
+  .cv p { margin: 0 0 0.9rem; }
+  .item { margin-bottom: 1.6rem; }
+  .item-top { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; align-items: baseline; }
+  .item h3 { margin: 0; font-size: 1rem; color: var(--fg); }
+  .item h3 a { color: inherit; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+  .item .when { color: var(--dim); font-size: 0.85rem; white-space: nowrap; }
+  .item .sub { margin: 0.15rem 0 0.5rem; color: var(--dim); font-size: 0.85rem; font-family: var(--mono); }
+  .item ul { margin: 0.3rem 0 0; padding-left: 1.2rem; }
+  .item li { margin-bottom: 0.25rem; }
+  .skills { display: grid; grid-template-columns: 8.5rem 1fr; gap: 0.35rem 1rem; margin: 0; font-size: 0.92rem; }
+  .skills dt { color: var(--dim); }
+  .skills dd { margin: 0; color: var(--fg); }
+
+  @media print {
+    @page { size: A4; margin: 12mm 14mm; }
+    h1 { font-size: 22pt; margin: 0 0 0.2rem; }
+    .cv-head .role { font-size: 11pt; }
+    .cv-links { margin-top: 0.5rem; }
+    :root, :root[data-theme="light"] { --bg: #fff; --fg: #111; --body: #222; --dim: #555; --line: #ccc; --accent: #b4532f; }
+    html { font-size: 9.6pt; }
+    body { font-size: 1rem; background: #fff; }
+    .top, .pdf, .post-nav { display: none !important; }
+    .grid { display: block; padding: 0; }
+    .cv { padding: 0; }
+    .cv-head { padding-bottom: 0.8rem; }
+    .cv section { padding-top: 0.9rem; }
+    .cv h2 { break-after: avoid; }
+    .cv h2 { margin-bottom: 0.5rem; }
+    .item { margin-bottom: 0.65rem; break-inside: avoid; }
+    .item .sub { margin: 0 0 0.25rem; }
+    .skills { gap: 0.15rem 1rem; }
+    .cv p, .cv li { line-height: 1.45; }
+    .cv p { margin-bottom: 0.4rem; }
+    a { text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+  <header class="top">
+    <a href="/" aria-label="Home"><svg class="mascot" data-pixel="dragon" aria-hidden="true"></svg></a>
+    <nav aria-label="Site">
+      <a href="/"><kbd>[H]</kbd> Home</a>
+      <a href="/blog/"><kbd>[B]</kbd> Blog</a>
+      <a href="/resume/" aria-current="page"><kbd>[R]</kbd> Resume</a>
+      <a href="/#term"><kbd>[T]</kbd> Terminal</a>
+    </nav>
+    <a class="cta" href="mailto:avinashkamadri16@gmail.com">Say hello</a>
+  </header>
+
+  <main class="grid">
+    <div class="col cv">
+      <div class="cv-head">
+        <div>
+          <h1>Avinash Kamadri</h1>
+          <p class="role">Full-stack developer &middot; AI SaaS, frontend design &amp; backend systems</p>
+          <p class="where">Karimnagar, Telangana, India &middot; he/him</p>
+          <ul class="cv-links">
+            <li><a href="mailto:avinashkamadri16@gmail.com">avinashkamadri16@gmail.com</a></li>
+            <li><a href="https://avinashk.in">avinashk.in</a></li>
+            <li><a href="https://github.com/avikkk19">github.com/avikkk19</a></li>
+            <li><a href="https://www.linkedin.com/in/avinash-kamadri-28246935a/">LinkedIn</a></li>
+          </ul>
+        </div>
+        <a class="pdf" href="/resume/avinash-kamadri-resume.pdf" download>Download PDF</a>
+      </div>
+
+      <section aria-labelledby="s-summary">
+        <h2 id="s-summary">Summary</h2>
+        <p>Full-stack developer working on AI-powered SaaS products and workflow automation. I build user flows and dashboards on the front end, and APIs, database schemas and service logic on the back end, and I help get them deployed. I like software that makes everyday business work clearer and easier to manage.</p>
+      </section>
+
+      <section aria-labelledby="s-exp">
+        <h2 id="s-exp">Experience</h2>
+        <div class="item">
+          <div class="item-top"><h3>Full-Stack Developer &middot; Flashback Labs&trade;</h3></div>
+          <ul>
+            <li>Build features across a SaaS product: user flows, dashboards, CRM-style features and AI-assisted workflows.</li>
+            <li>Work on authentication, cloud file storage, background jobs and third-party integrations.</li>
+            <li>Design PostgreSQL schemas and ship changes through Prisma migrations.</li>
+            <li>Help containerise and deploy services with Docker on AWS.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="s-proj">
+        <h2 id="s-proj">Projects</h2>
+        <div class="item">
+          <div class="item-top"><h3><a href="https://crecon.vercel.app">CreCon</a></h3><span class="when">React · Supabase</span></div>
+          <p class="sub">Creator Connect &middot; <a href="https://github.com/avikkk19/crecon">github.com/avikkk19/crecon</a></p>
+          <ul>
+            <li>A platform where content creators post editing and design jobs, and freelance editors apply with demos.</li>
+            <li>Email sign-in, real-time chat and file uploads built on Supabase auth, database, storage and edge functions.</li>
+          </ul>
+        </div>
+        <div class="item">
+          <div class="item-top"><h3>Flashback mobile app</h3><span class="when">React Native · Expo</span></div>
+          <p class="sub"><a href="https://github.com/avikkk19/Flashback-native-app">github.com/avikkk19/Flashback-native-app</a></p>
+          <ul>
+            <li>Selfie capture with on-device liveness detection using MediaPipe face landmarks.</li>
+            <li>OTP sign-in with JWTs, and upload of the captured image.</li>
+          </ul>
+        </div>
+        <div class="item">
+          <div class="item-top"><h3><a href="https://drunkdragon.vercel.app">DrunkDragon</a></h3><span class="when">MERN</span></div>
+          <p class="sub">F1 blog platform &middot; <a href="https://github.com/avikkk19/drunkdragon">github.com/avikkk19/drunkdragon</a></p>
+          <ul>
+            <li>A blogging site for Formula 1 fans: React front end, Express and MongoDB API.</li>
+            <li>JWT and Google sign-in through Firebase, with image uploads to AWS.</li>
+          </ul>
+        </div>
+        <div class="item">
+          <div class="item-top"><h3><a href="https://avinashk.in">avinashk.in</a></h3><span class="when">HTML · JS · three.js</span></div>
+          <ul>
+            <li>A personal site you can drive like a terminal, with slash commands, a blog and a 3D Red Bull RB18 lapping Spa in the footer.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="s-skills">
+        <h2 id="s-skills">Skills</h2>
+        <dl class="skills">
+          <dt>Languages</dt><dd>JavaScript, TypeScript, Python, C, HTML, CSS, SQL</dd>
+          <dt>Frontend</dt><dd>Next.js, React, React Native, Tailwind CSS</dd>
+          <dt>Backend</dt><dd>NestJS, Node.js, Express</dd>
+          <dt>Data</dt><dd>PostgreSQL, Prisma, MongoDB, Supabase</dd>
+          <dt>Infra</dt><dd>Docker, AWS, Vercel</dd>
+          <dt>AI</dt><dd>ML agents, AI-assisted workflows</dd>
+        </dl>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
