@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Blog · Avinash Kamadri</title>
+<meta name="description" content="Notes from Avinash Kamadri on what I'm building and learning." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script>try { if (localStorage.getItem("theme") === "light") document.documentElement.dataset.theme = "light"; } catch (e) {}</script>
+<script src="/assets/pixel.js" defer></script>
+<script src="/blog/blog.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <a href="/" aria-label="Home"><svg class="mascot" data-pixel="dragon" aria-hidden="true"></svg></a>
+    <nav aria-label="Site">
+      <a href="/"><kbd>[H]</kbd> Home</a>
+      <a href="/blog/" aria-current="page"><kbd>[B]</kbd> Blog</a>
+      <a href="/#term"><kbd>[T]</kbd> Terminal</a>
+    </nav>
+    <a class="cta" href="mailto:avinashkamadri16@gmail.com">Say hello</a>
+  </header>
+
+  <main class="grid">
+    <div class="col">
+      <div class="index-head">
+        <svg class="post-icon" data-pixel="pen" aria-hidden="true"></svg>
+        <h1>Blog</h1>
+        <p>Notes on what I&rsquo;m building and learning.</p>
+      </div>
+      <ul class="rows" id="post-list" aria-label="Posts"></ul>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lapping Spa in the browser · Avinash Kamadri</title>
+<meta name="description" content="How the RB18 in my footer stays on the road, picks its speed and gets filmed like a broadcast." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script>try { if (localStorage.getItem("theme") === "light") document.documentElement.dataset.theme = "light"; } catch (e) {}</script>
+<script src="/assets/pixel.js" defer></script>
+<script src="/blog/blog.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <a href="/" aria-label="Home"><svg class="mascot" data-pixel="dragon" aria-hidden="true"></svg></a>
+    <nav aria-label="Site">
+      <a href="/"><kbd>[H]</kbd> Home</a>
+      <a href="/blog/" aria-current="page"><kbd>[B]</kbd> Blog</a>
+      <a href="/#term"><kbd>[T]</kbd> Terminal</a>
+    </nav>
+    <a class="cta" href="mailto:avinashkamadri16@gmail.com">Say hello</a>
+  </header>
+
+  <div class="grid post-head-wrap">
+    <div class="col post-head">
+      <svg class="post-icon" data-pixel="flag" aria-hidden="true"></svg>
+      <span class="tag">3D</span>
+      <h1>Lapping Spa in the browser</h1>
+      <p class="dek">How the RB18 in my footer stays on the road, picks its speed and gets filmed like a broadcast.</p>
+      <dl class="meta">
+        <div><dt>Author</dt><dd>Avinash Kamadri</dd></div>
+        <div><dt>Published</dt><dd><time datetime="2026-09-30">Sep 30, 2026</time></dd></div>
+        <div><dt>Reading time</dt><dd data-reading>3 min</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="grid body">
+    <aside class="rail" aria-label="On this page">
+      <div class="rail-in">
+        <div>
+          <p class="rail-title">Lapping Spa in the browser</p>
+          <p class="lbl">Tree</p>
+          <ol class="tree" id="tree"></ol>
+          <p class="bar" id="bar" aria-hidden="true"></p>
+          <p class="lbl keys">Press J / K to jump</p>
+        </div>
+        <div class="share">
+          <p class="lbl">Share</p>
+          <ul>
+            <li><a id="share-x" href="#" target="_blank" rel="noopener">X.com</a></li>
+            <li><a id="share-li" href="#" target="_blank" rel="noopener">LinkedIn</a></li>
+            <li><a id="share-mail" href="#">Email</a></li>
+            <li><button type="button" id="copy-url">Copy URL</button></li>
+            <li><button type="button" id="copy-md">Copy markdown</button></li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+
+    <article>
+      <p class="draft">Draft: written from the code in this repo. Rewrite it in your own voice before publishing.</p>
+
+      <p>At the bottom of my homepage a Red Bull RB18 laps Spa-Francorchamps, cut together like a TV broadcast. It&rsquo;s plain three.js in one HTML file, no game engine. Here&rsquo;s how the pieces fit.</p>
+
+      <h2>The track and the line</h2>
+      <p>The circuit is a glTF model, and the racing line comes from the <a href="https://github.com/TUMFTM/racetrack-database">TUMFTM racetrack-database</a>, which publishes centerlines for real circuits. I turn those points into a closed Catmull-Rom curve and resample it every metre, so every lookup after that is just an array index: position, direction and speed at metre <code>s</code>.</p>
+<pre><code>const curve = new THREE.CatmullRomCurve3(points, true, "centripetal");
+const N = Math.round(curve.getLength());
+for (let i = 0; i &lt; N; i++) pos.push(curve.getPointAt(i / N));</code></pre>
+
+      <h2>Keeping the car on the road</h2>
+      <p>A centerline alone floats the car above crests and sinks it into dips. So for every metre I cast a ray straight down where the left and right wheels would be, 0.8&nbsp;m either side of the line, and record where it hits the asphalt.</p>
+      <p>Casting thousands of rays at a detailed track mesh is slow, so the road meshes get a bounding-volume tree from <code>three-mesh-bvh</code> first. With that, the whole lap&rsquo;s ground samples take a moment at load time.</p>
+      <h3>Pitch and roll</h3>
+      <p>Each frame I look up the ground under the front and rear axles (1.8&nbsp;m ahead and behind) and under each side. Front minus rear gives the car&rsquo;s forward direction, left minus right gives its sideways tilt, and a cross product gives &ldquo;up&rdquo;. That basis becomes the car&rsquo;s rotation, so it climbs Eau Rouge nose-up and leans on the banking.</p>
+
+      <h2>Picking a speed</h2>
+      <p>There&rsquo;s no physics engine. Instead the car gets a speed for every metre of the lap, worked out in three steps:</p>
+      <ol>
+        <li><strong>Corner limit.</strong> Curvature comes from how much the heading changes over &plusmn;12&nbsp;m. The fastest you can take a curve is roughly <code>sqrt(grip / curvature)</code>, capped at 91&nbsp;m/s.</li>
+        <li><strong>Acceleration.</strong> A forward pass stops the speed rising faster than the car could accelerate, with less push as it gets quicker.</li>
+        <li><strong>Braking.</strong> A backward pass makes it slow down before corners instead of arriving too fast.</li>
+      </ol>
+      <p>Running both passes twice settles the loop where the end of the lap meets the start. The readout in the corner just shows that number in km/h.</p>
+
+      <h2>Wheels that turn</h2>
+      <p>The car model stores all four tyres in one mesh, which means they can only move together. At load time I split the triangles by which corner of the car they sit in, then give each wheel two pivots: an outer one that steers (front wheels only) and an inner one that spins.</p>
+      <p>Real wheel speed at 300&nbsp;km/h is far faster than 60 frames a second can show; it strobes and looks like it&rsquo;s rolling backwards. So the visible spin is capped.</p>
+
+      <h2>The broadcast director</h2>
+      <p>The camera work is a list of shots keyed by distance around the lap. Each one is a type:</p>
+      <ul>
+        <li><strong>chase</strong>: behind the car, smoothed so it swings through corners</li>
+        <li><strong>tcam</strong>: on the roll hoop, looking down the track</li>
+        <li><strong>heli</strong>: high and to the side, with a long lens</li>
+        <li><strong>tv</strong>: a fixed trackside camera that pans as the car passes</li>
+      </ul>
+      <p>For trackside shots I give the apex and which side to stand on, and the code places the camera from the track geometry. The zoom keeps the car about the same size on screen as it approaches, the way a real camera operator would. A couple of shots also slow time down, for Raidillon and the Bus Stop.</p>
+
+      <h2>Keeping it light</h2>
+      <ul>
+        <li>three.js and about 11&nbsp;MB of models only load when you scroll near the footer.</li>
+        <li>If frames take longer than about 24&nbsp;ms, the render resolution steps down.</li>
+        <li>Nothing renders while the canvas is off screen.</li>
+        <li>With reduced motion turned on, it holds a single shot at Eau Rouge.</li>
+      </ul>
+      <p>Type <code>/f1</code> on the <a href="/">homepage</a> to jump straight to it.</p>
+
+      <nav class="post-nav" aria-label="More posts"></nav>
+    </article>
+  </div>
+</body>
+</html>

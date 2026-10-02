@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>A terminal for a homepage · Avinash Kamadri</title>
+<meta name="description" content="Swapping a hero section for a prompt: slash commands, a pixel dragon and no framework." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/blog/blog.css" />
+<script>try { if (localStorage.getItem("theme") === "light") document.documentElement.dataset.theme = "light"; } catch (e) {}</script>
+<script src="/assets/pixel.js" defer></script>
+<script src="/blog/blog.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <a href="/" aria-label="Home"><svg class="mascot" data-pixel="dragon" aria-hidden="true"></svg></a>
+    <nav aria-label="Site">
+      <a href="/"><kbd>[H]</kbd> Home</a>
+      <a href="/blog/" aria-current="page"><kbd>[B]</kbd> Blog</a>
+      <a href="/#term"><kbd>[T]</kbd> Terminal</a>
+    </nav>
+    <a class="cta" href="mailto:avinashkamadri16@gmail.com">Say hello</a>
+  </header>
+
+  <div class="grid post-head-wrap">
+    <div class="col post-head">
+      <svg class="post-icon" data-pixel="prompt" aria-hidden="true"></svg>
+      <span class="tag">Frontend</span>
+      <h1>A terminal for a homepage</h1>
+      <p class="dek">Swapping a hero section for a prompt: slash commands, a pixel dragon and no framework.</p>
+      <dl class="meta">
+        <div><dt>Author</dt><dd>Avinash Kamadri</dd></div>
+        <div><dt>Published</dt><dd><time datetime="2026-10-02">Oct 2, 2026</time></dd></div>
+        <div><dt>Reading time</dt><dd data-reading>2 min</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="grid body">
+    <aside class="rail" aria-label="On this page">
+      <div class="rail-in">
+        <div>
+          <p class="rail-title">A terminal for a homepage</p>
+          <p class="lbl">Tree</p>
+          <ol class="tree" id="tree"></ol>
+          <p class="bar" id="bar" aria-hidden="true"></p>
+          <p class="lbl keys">Press J / K to jump</p>
+        </div>
+        <div class="share">
+          <p class="lbl">Share</p>
+          <ul>
+            <li><a id="share-x" href="#" target="_blank" rel="noopener">X.com</a></li>
+            <li><a id="share-li" href="#" target="_blank" rel="noopener">LinkedIn</a></li>
+            <li><a id="share-mail" href="#">Email</a></li>
+            <li><button type="button" id="copy-url">Copy URL</button></li>
+            <li><button type="button" id="copy-md">Copy markdown</button></li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+
+    <article>
+      <p class="draft">Draft: written from the code in this repo. Rewrite it in your own voice before publishing.</p>
+
+      <p>My homepage used to open on a big name over a 3D render. Now it opens on a prompt. You can read the page like a normal site, or type <code>/</code> and drive it. Everything is one HTML file and a little vanilla JavaScript.</p>
+
+      <h2>Commands are just a lookup table</h2>
+      <p>Each command is a function that returns lines of output. The first line gets a dot, the rest are indented underneath, like a tool result in a coding agent.</p>
+<pre><code>const COMMANDS = {
+  about: () =&gt; ["Read about.md (4 lines)", ...ABOUT],
+  f1:    () =&gt; { go("spa"); return ["Heading to Spa-Francorchamps…"]; },
+  clear: () =&gt; { log.replaceChildren(); return null; },
+};</code></pre>
+      <p>Aliases map extra words onto the same functions, so <code>skills</code> runs <code>stack</code> and <code>lap</code> runs <code>f1</code>. Anything else gets a friendly &ldquo;command not found&rdquo;.</p>
+
+      <h2>The slash menu</h2>
+      <p>Typing <code>/</code> opens a list of commands that filters as you type. The arrow keys move the highlight, Enter runs it, Tab completes it and Escape closes it. The input is marked up as a combobox with the menu as its listbox, so screen readers announce the highlighted option.</p>
+      <h3>Small touches</h3>
+      <ul>
+        <li>&uarr; and &darr; walk back through what you&rsquo;ve typed when the menu is closed.</li>
+        <li>A short &ldquo;Thinking&hellip;&rdquo; line shows before each answer. It&rsquo;s skipped if you&rsquo;ve asked for reduced motion.</li>
+        <li>Single letters in square brackets (<code>[A]</code>, <code>[W]</code>&hellip;) run commands from anywhere on the page.</li>
+        <li><code>/theme</code> flips between dark and light and remembers your choice.</li>
+      </ul>
+
+      <h2>A dragon made of text</h2>
+      <p>The mascot is drawn from a character map. Each character is a colour, and a few lines of code turn it into SVG squares:</p>
+<pre><code>"..........h.h.......",
+".ww......####.......",
+".www....##e###ffF...",
+"..wwww.#######fFFFf.",</code></pre>
+      <p>The <code>e</code> pixels blink every few seconds. The <code>f</code> pixels are fire, hidden until you type <code>/dragon</code>. The icons on these blog posts use the same trick.</p>
+
+      <h2>Keeping it honest</h2>
+      <p>A terminal is fun, but it can&rsquo;t be the only way in. All of the content is also on the page as normal HTML, the prompt works on a phone keyboard, and the heavy 3D in the footer waits until you scroll to it.</p>
+      <p>Try it on the <a href="/">homepage</a>: type <code>/help</code>.</p>
+
+      <nav class="post-nav" aria-label="More posts"></nav>
+    </article>
+  </div>
+</body>
+</html>

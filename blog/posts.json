@@ -1,0 +1,74 @@
+[
+  {
+    "slug": "max-vs-lewis-2021",
+    "title": "Max vs Lewis: the 2021 title fight",
+    "summary": "Twenty-two races, two big crashes and one final lap. The season that had everything.",
+    "tag": "F1",
+    "icon": "trophy",
+    "date": "2026-10-03",
+    "minutes": 4
+  },
+  {
+    "slug": "daniel-ricciardo-career",
+    "title": "Daniel Ricciardo: the smile and the late brake",
+    "summary": "Eight wins, a lot of shoeys and some of the best overtakes of his era.",
+    "tag": "F1",
+    "icon": "helmet",
+    "date": "2026-10-03",
+    "minutes": 3
+  },
+  {
+    "slug": "michael-schumacher",
+    "title": "Michael Schumacher: building a dynasty",
+    "summary": "Seven titles, 91 wins, and how he turned Ferrari back into a winning team.",
+    "tag": "F1",
+    "icon": "trophy",
+    "date": "2026-10-03",
+    "minutes": 3
+  },
+  {
+    "slug": "lewis-hamilton",
+    "title": "Lewis Hamilton: from Stevenage to seven titles",
+    "summary": "A one-point heartbreak, a last-corner title, a bold move to Mercedes and a dream move to Ferrari.",
+    "tag": "F1",
+    "icon": "helmet",
+    "date": "2026-10-03",
+    "minutes": 2
+  },
+  {
+    "slug": "fernando-alonso",
+    "title": "Fernando Alonso: the one who never stops",
+    "summary": "Two titles, a run of almost-titles, Le Mans wins and more F1 starts than anyone.",
+    "tag": "F1",
+    "icon": "helmet",
+    "date": "2026-10-03",
+    "minutes": 2
+  },
+  {
+    "slug": "valtteri-bottas",
+    "title": "Valtteri Bottas: the quiet one",
+    "summary": "Ten wins, two runner-up finishes, and the hardest job in F1: teammate to Lewis Hamilton.",
+    "tag": "F1",
+    "icon": "helmet",
+    "date": "2026-10-03",
+    "minutes": 2
+  },
+  {
+    "slug": "a-terminal-for-a-homepage",
+    "title": "A terminal for a homepage",
+    "summary": "Swapping a hero section for a prompt: slash commands, a pixel dragon and no framework.",
+    "tag": "Frontend",
+    "icon": "prompt",
+    "date": "2026-10-02",
+    "minutes": 2
+  },
+  {
+    "slug": "lapping-spa-in-the-browser",
+    "title": "Lapping Spa in the browser",
+    "summary": "How the RB18 in my footer stays on the road, picks its speed and gets filmed like a broadcast.",
+    "tag": "3D",
+    "icon": "flag",
+    "date": "2026-09-30",
+    "minutes": 3
+  }
+]
